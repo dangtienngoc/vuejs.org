@@ -1,12 +1,14 @@
 ---
-title: Thuộc tính computed và watcher
+title: Computed property và watcher
 type: guide
 order: 5
 ---
 
-## Thuộc tính computed
+## Computed property
 
-Những biểu thức đơn giản được viết bên trong template sẽ rất tiện lợi. Tuy nhiên, những biểu thức phức tạp được viết theo cách đó sẽ khiến template cồng kềnh và khó bảo trì. Ví dụ như:
+<p class="tip">Computed property có thể hiểu là một thuộc tính được tính toán và trong bài viết này chúng tôi quyết định giữ nguyên cụm từ `computed property`.</p>
+
+Viết biểu thức trong template thì rất tiện lợi, nhưng chỉ dành cho những biểu thức có tính toán đơn giản. Những biểu thức phức tạp được viết theo cách đó sẽ khiến template cồng kềnh và khó bảo trì. Ví dụ như:
 
 ``` html
 <div id="example">
@@ -14,16 +16,16 @@ Những biểu thức đơn giản được viết bên trong template sẽ rấ
 </div>
 ```
 
-Ở trường hợp này, template không còn đơn giản và mang tính khai báo nữa (declarative). Bạn phải mất chút thời gian thì mới nhận ra được `message` được đảo ngược. Vấn đề sẽ trở nên tồi tệ nếu bạn sử dụng cách này lập đi lập lại trong template.
+Đến đây, template không còn đơn giản và mang tính khai báo (declarative). Bạn phải mất chút thời gian thì mới nhận ra được `message` bị đảo ngược. Càng tệ hơn khi bạn sử dụng biến `message` bị đảo ngược này lặp đi lặp lại.
 
-Đó là lí do tại sao bạn nên dùng **thuộc tính computed** cho những biểu thức phức tạp.
+Đó là lí do tại sao đối với bất kì logic phức tạp, bạn nên sử dụng **computed property**.
 
-### Ví dụ căn bản
+### Ví dụ cơ bản
 
 ``` html
 <div id="example">
-  <p>Nội dung gốc: "{{ message }}"</p>
-  <p>Nội dung được đảo ngược (computed): "{{ reversedMessage }}"</p>
+  <p>Thông điệp ban đầu: "{{ message }}"</p>
+  <p>Thông điệp bị đảo ngược bằng tính toán (computed): "{{ reversedMessage }}"</p>
 </div>
 ```
 
@@ -47,8 +49,8 @@ Kết quả là:
 
 {% raw %}
 <div id="example" class="demo">
-  <p>Nội dung gốc: "{{ message }}"</p>
-  <p>Nội dung được đảo ngược (computed): "{{ reversedMessage }}"</p>
+  <p>Thông điệp ban đầu: "{{ message }}"</p>
+  <p>Thông điệp bị đảo ngược (computed): "{{ reversedMessage }}"</p>
 </div>
 <script>
 var vm = new Vue({
@@ -65,7 +67,7 @@ var vm = new Vue({
 </script>
 {% endraw %}
 
-Ở đây chúng ta khai báo một thuộc tính computed là `reversedMessage`. Hàm được dùng như trên sẽ là một hàm getter cho thuộc tính `vm.reversedMessage`:
+Ở đây chúng ta khai báo một computed property là `reversedMessage`. Hàm mà chúng ta đã cung cấp sẽ được sử dụng như một hàm getter cho thuộc tính `vm.reversedMessage`:
 
 ``` js
 console.log(vm.reversedMessage) // => 'olleH'
@@ -73,16 +75,16 @@ vm.message = 'Goodbye'
 console.log(vm.reversedMessage) // => 'eybdooG'
 ```
 
-Bạn có thể mở console và thử chạy ví dụ đảo ngược chữ. Gíá trị của `vm.reversedMessage` luôn phụ thuộc vào giá trị của `vm.message`.
+Bạn có thể mở console và thử chạy đối tượng vm mẫu ở trên. Giá trị của `vm.reversedMessage` luôn phụ thuộc vào giá trị của `vm.message`.
 
-Bạn có thể ràng buộc dữ liệu (data-bind) cho những thuộc tính computed trong template một cách bình thường như những thuộc tính khác. Vue biết được `vm.reversedMessage` phụ thuộc vào `vm.message`, vì vậy Vue sẽ cập nhất bất kì ràng buộc (binding) nào phụ thuộc vào `vm.reversedMessage` khi `vm.message` thay đổi. Phần tốt nhất đó là chúng ta tạo ra được mối liên hệ giữa các dependency: các hàm getter của computed thì không bị side effect (nhiệm vụ của getter chỉ là xử lí và trả về giá trị cho thuộc tính computed), chính điều đó giúp dễ hiểu và dễ kiểm tra (test).
+Bạn có thể ràng buộc dữ liệu (data-bind) cho computed property trong template một cách bình thường như những thuộc tính khác. Vue biết được `vm.reversedMessage` phụ thuộc vào `vm.message`, vậy nên Vue sẽ cập nhật bất kì ràng buộc (binding) nào phụ thuộc vào `vm.reversedMessage` khi `vm.message` thay đổi. Điểm hay nhất ở đây là chúng ta tạo ra được mối liên hệ giữa các thành phần phụ thuộc (dependency): các hàm getter của computed thì không bị hiệu ứng lề (side effect), chính điều đó giúp dễ hiểu và dễ kiểm tra.
 
 ### Computed caching và phương thức
 
-Bạn sẽ nhận thấy rằng chúng ta cũng có thể đạt được nội dung đảo ngược bằng cách sử dụng một phương thức:
+Bạn có lẽ đã nhận ra chúng ta cũng có thể đạt được cùng một kết quả bằng cách sử dụng một phương thức:
 
 ``` html
-<p>Nội dung đảo ngược: "{{ reverseMessage() }}"</p>
+<p>Thông điệp bị đảo ngược: "{{ reverseMessage() }}"</p>
 ```
 
 ``` js
@@ -94,9 +96,9 @@ methods: {
 }
 ```
 
-Thay vì sử dụng thuộc tính computed, chúng ta cũng có thể dùng một phương thức thay thế. Nếu xét về kết quả cuối cùng thì hai cách tiếp cận này thật sự là như sau. Tuy nhiên, sự khác biệt ở đây là **những thuộc tính computed được cache lại dựa vào những dependency (những giá trị mà computed phụ thuộc vào).** Một thuộc tính computed chỉ được tính toán lại khi những dependency của chúng thay đổi. Điều này có nghĩa như sau: nếu giá trị của `message` không thay đổi, thì những truy cập tới computed `reversedMessage` sẽ ngay lập tức trả về kết quả được tính toán trước đó mà không phải chạy lại hàm một lần nữa.
+Thay vì sử dụng computed property, chúng ta cũng có thể dùng một phương thức thay thế. Nếu xét về kết quả cuối cùng thì hai cách tiếp cận này thât ra chỉ là một. Tuy nhiên, sự khác biệt ở đây là **computed property được cache lại dựa vào những những thành phần phụ thuộc (dependency).** Một computed property chỉ được tính toán lại khi những thành phần phụ thuộc của chúng thay đổi. Điều này có nghĩa: miễn là giá trị của `message` không thay đổi, thì những truy cập tới computed `reversedMessage` sẽ ngay lập tức trả về kết quả được tính toán trước đó mà không phải chạy lại hàm một lần nữa.
 
-Điều này cũng có nghĩa giá trị của một thuộc tính computed sẽ không được cập nhật nếu dependency của nó không thay đổi. Ví dụ phía dưới, computed `now` sẽ không được cập nhật vì `Date.now` không phải là một reactive dependency:
+Điểu này cũng có nghĩa computed property dưới đây sẽ không bao giờ cập nhật, bởi vì `Data.now()` không phải là một thành phần phụ thuộc phản ứng (reactive dependency) :
 
 ``` js
 computed: {
@@ -106,9 +108,9 @@ computed: {
 }
 ```
 
-Về phần phương thức, chúng sẽ **luôn** được gọi khi có một sự kiện re-render diễn ra.
+Để so sánh, một phương phương thức **luôn** được gọi khi có một sự kiện render lại (re-render) xảy ra.
 
-Tại sao chúng ta lại cần việc cache dữ liệu? Thử tưởng tượng chúng ta có một thuộc tính computed **A** có nhiều thao tác tính toán trên một mảng dữ liệu lớn. Chúng ta lại có nhiều thuộc tính computed phụ thuộc vào **A**. Nếu không cache lại, chúng ta phải thực thi hàm getter của **A** nhiều lần! Trong trường hợp không cần sử dụng cache, hãy sử dụng phương thức thay cho computed.
+Tại sao chúng ta lại cần phải cache? Thử tưởng tượng chúng ta có một computed property **A** có nhiều thao tác tính toán trên một mảng dữ liệu lớn. Chúng ta lại có nhiều computed property phụ thuộc vào **A**. Nếu không cache lại, chúng ta phải thực thi hàm getter của **A** nhiều hơn mức cần thiết rất nhiều! Trong trường hợp bạn không muốn cache, hãy sử dụng một phương thức thay thế.
 
 ### Thuộc tính computed và watched
 
